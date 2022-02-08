@@ -70,7 +70,7 @@ async def has_channel(channel_name):
     channels = bot.get_all_channels()
     await asyncio.sleep(5)  # FIXME => Not a proper method to wait for a request. Will have to look for alternatives
     for channel in channels:
-        if str(channel) == channel_name:
+        if str(channel).startswith(channel_name):
             return True
     return False
 
