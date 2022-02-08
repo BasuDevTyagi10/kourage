@@ -96,7 +96,7 @@ async def create_issue_embed(issue_id, issue_description, assigned_to, assigned_
 
 async def create_text_channel(issue_id, issue_description, assigned_to, assigned_by, watchers):
     server = bot.get_guild(927231626260406283)
-    channel_name = "issue-" + str(issue_id)
+    channel_name = "issue-" + str(issue_id) + "-" + str(issue_description)
     channel = await server.create_text_channel(channel_name)
     await channel.set_permissions(server.default_role, read_messages=False)
 
@@ -114,7 +114,8 @@ async def remove_closed_channels():
     await asyncio.sleep(5)  # FIXME => Not a proper method to wait for a request. Will have to look for alternatives
     for channel in channels:
         if str(channel.name).startswith('issue'):
-            issue_id = channel.name.strip("issue-")
+            issue_id = channel.name.split('-')[1]
+            # issue_id = channel.name.strip("issue-")
             issue = redmine.issue.get(issue_id)
             if str(issue.status) == 'Closed' or str(issue.status) == 'On Hold':
                 archive_channel = bot.get_channel(id=938461049617809438)
