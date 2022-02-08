@@ -62,16 +62,16 @@ async def on_raw_reaction_add(payload):
 
     ctx = bot.get_channel(SUBMISSION_CHANNEL)
     try:
-        await ctx.send("Enter your name", delete_after=10.0)
+        await ctx.send("Enter your name", delete_after=60.0)
         name = await ctx_input(payload, bot)
 
-        await ctx.send("Enter your email", delete_after=10.0)
+        await ctx.send("Enter your email", delete_after=60.0)
         email = await ctx_input(payload, bot)
 
-        await ctx.send("Enter your phone", delete_after=10.0)
+        await ctx.send("Enter your phone", delete_after=60.0)
         phone = await ctx_input(payload, bot)
 
-        await ctx.send("Upload your resume", delete_after=10.0)
+        await ctx.send("Upload your resume", delete_after=60.0)
         ctx = await ctx_upload(payload, bot)
 
         for attachment in ctx.attachments:
