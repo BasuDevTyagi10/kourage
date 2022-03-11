@@ -17,7 +17,7 @@ RESUME_CHANNEL = int(os.getenv('RESUME_CHANNEL'))
 SUBMISSION_CHANNEL = int(os.getenv('SUBMISSION_CHANNEL'))
 
 
-async def ctx_input(ctx, bot, timeout=60.0):
+async def ctx_input(ctx, bot, timeout=120.0):
     try:
         msg = await bot.wait_for(
             "message",
@@ -33,7 +33,7 @@ async def ctx_input(ctx, bot, timeout=60.0):
         return None
 
 
-async def ctx_upload(ctx, bot, timeout=60.0):
+async def ctx_upload(ctx, bot, timeout=120.0):
     def check(message):
         return message.author == ctx.member and bool(message.attachments)
 
@@ -62,16 +62,16 @@ async def on_raw_reaction_add(payload):
 
     ctx = bot.get_channel(SUBMISSION_CHANNEL)
     try:
-        await ctx.send("Enter your name", delete_after=60.0)
+        await ctx.send("Enter your name", delete_after=120.0)
         name = await ctx_input(payload, bot)
 
-        await ctx.send("Enter your email", delete_after=60.0)
+        await ctx.send("Enter your email", delete_after=120.0)
         email = await ctx_input(payload, bot)
 
-        await ctx.send("Enter your phone", delete_after=60.0)
+        await ctx.send("Enter your phone", delete_after=120.0)
         phone = await ctx_input(payload, bot)
 
-        await ctx.send("Upload your resume", delete_after=60.0)
+        await ctx.send("Upload your resume", delete_after=120.0)
         ctx = await ctx_upload(payload, bot)
 
         for attachment in ctx.attachments:
@@ -81,9 +81,12 @@ async def on_raw_reaction_add(payload):
                 channel = bot.get_channel(RESUME_CHANNEL)
                 await channel.send(file=discord.File(filename))
 
+        await ctx.send("Thank you for uploading your resume!", delete_after=60.0)
+
     except Exception:
         channel = bot.get_channel(RESUME_CHANNEL)
-        await channel.send("Something went wrong. Please try again.", delete_after=5.0)
+        await channel.send("Something went wrong. Please try again.", delete_after=30.0)
+        await ctx.send("Something went wrong. Please try again.", delete_after=30.0)
         return
 
 
