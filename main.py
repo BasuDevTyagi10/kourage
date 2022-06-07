@@ -70,7 +70,7 @@ async def has_channel(channel_name):
     channels = bot.get_all_channels()
     await asyncio.sleep(5)  # FIXME => Not a proper method to wait for a request. Will have to look for alternatives
     for channel in channels:
-        if str(channel) == channel_name:
+        if str(channel).startswith(channel_name):
             return True
     return False
 
@@ -116,22 +116,25 @@ async def remove_closed_channels():
         if str(channel.name).startswith('issue'):
             issue_id = channel.name.split('-')[1]
             # issue_id = channel.name.strip("issue-")
-            issue = redmine.issue.get(issue_id)
-            if str(issue.status) == 'Closed' or str(issue.status) == 'On Hold':
-                archive_channel = bot.get_channel(id=938461049617809438)
-                if channel and archive_channel:
-                    transcript = await chat_exporter.export(channel, set_timezone='UTC')
-                    transcript_file = discord.File(io.BytesIO(transcript.encode()), filename=f"{issue_id}.html")
-                    message = await archive_channel.send(file=transcript_file)
+            try:
+                issue = redmine.issue.get(issue_id)
+                if str(issue.status) == 'Closed' or str(issue.status) == 'On Hold':
+                    archive_channel = bot.get_channel(id=938461049617809438)
+                    if channel and archive_channel:
+                        transcript = await chat_exporter.export(channel, set_timezone='UTC')
+                        transcript_file = discord.File(io.BytesIO(transcript.encode()), filename=f"{issue_id}.html")
+                        message = await archive_channel.send(file=transcript_file)
 
-                    filename = str(issue_id) + '.html'
-                    create_html_file(message.attachments[0].url, filename)
-                    token = get_file_token(filename, key)
-                    redmine.issue.update(
-                        int(issue_id),
-                        uploads=[{'token': token}]
-                    )
-                    await channel.delete()
+                        filename = str(issue_id) + '.html'
+                        create_html_file(message.attachments[0].url, filename)
+                        token = get_file_token(filename, key)
+                        redmine.issue.update(
+                            int(issue_id),
+                            uploads=[{'token': token}]
+                        )
+                        await channel.delete()
+            except: 
+                print("Issue id not found")
 
 
 async def delete_text_channel():  # Optional function for removing channels
@@ -182,6 +185,6 @@ remove_closed_issues.start()  # Threads
 
 if __name__ == "__main__":
     try:
-        bot.run(TOKEN)
+        bot.run(TOKEN, bot=False)
     except Exception as _e:
         print("Exception found at main worker.\n" + str(_e))
